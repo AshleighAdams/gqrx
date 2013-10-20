@@ -99,6 +99,7 @@ MainWindow::MainWindow(const QString cfgfile, bool edit_conf, QWidget *parent) :
     uiDockInputCtl = new DockInputCtl();
     //uiDockIqPlay = new DockIqPlayer();
     uiDockFft = new DockFft();
+    uiDockScanner = new DockScanner();
 
     /* Add dock widgets to main window. This should be done even for
        dock widgets that are going to be hidden, otherwise they will
@@ -107,7 +108,9 @@ MainWindow::MainWindow(const QString cfgfile, bool edit_conf, QWidget *parent) :
     */
     addDockWidget(Qt::RightDockWidgetArea, uiDockInputCtl);
     addDockWidget(Qt::RightDockWidgetArea, uiDockRxOpt);
+    addDockWidget(Qt::RightDockWidgetArea, uiDockScanner);
     tabifyDockWidget(uiDockInputCtl, uiDockRxOpt);
+    tabifyDockWidget(uiDockRxOpt, uiDockScanner);
 
     addDockWidget(Qt::RightDockWidgetArea, uiDockAudio);
     addDockWidget(Qt::RightDockWidgetArea, uiDockFft);
@@ -131,6 +134,7 @@ MainWindow::MainWindow(const QString cfgfile, bool edit_conf, QWidget *parent) :
     ui->menu_View->addAction(uiDockRxOpt->toggleViewAction());
     ui->menu_View->addAction(uiDockAudio->toggleViewAction());
     ui->menu_View->addAction(uiDockFft->toggleViewAction());
+    ui->menu_View->addAction(uiDockScanner->toggleViewAction());
     //ui->menu_View->addAction(uiDockIqPlay->toggleViewAction());
     ui->menu_View->addSeparator();
     ui->menu_View->addAction(ui->mainToolBar->toggleViewAction());
@@ -176,7 +180,7 @@ MainWindow::MainWindow(const QString cfgfile, bool edit_conf, QWidget *parent) :
     connect(uiDockFft, SIGNAL(gotoDemodFreq()), ui->plotter, SLOT(moveToDemodFreq()));
     connect(uiDockFft, SIGNAL(fftColorChanged(QColor)), this, SLOT(setFftColor(QColor)));
     connect(uiDockFft, SIGNAL(fftFillToggled(bool)), this, SLOT(setFftFill(bool)));
-
+    connect(uiDockScanner, SIGNAL(newDemodFreqDelta(qint64)), this, SLOT(setFilterOffset(qint64)));
 
     // restore last session
     if (!loadConfig(cfgfile, true))
@@ -249,6 +253,7 @@ MainWindow::~MainWindow()
     delete uiDockRxOpt;
     delete uiDockAudio;
     delete uiDockFft;
+    delete uiDockScanner;
     //delete uiDockIqPlay;
     delete uiDockInputCtl;
     delete rx;
@@ -368,6 +373,7 @@ bool MainWindow::loadConfig(const QString cfgfile, bool check_crash)
         uiDockRxOpt->setFilterOffsetRange((qint64)(0.9*actual_rate));
         ui->plotter->setSampleRate(actual_rate);
         ui->plotter->setSpanFreq((quint32)actual_rate);
+        uiDockScanner->setSampleRate(actual_rate);
     }
 
     qint64 bw = m_settings->value("input/bandwidth", 0).toInt(&conv_ok);
@@ -569,6 +575,9 @@ void MainWindow::setFilterOffset(qint64 freq_hz)
 
     qint64 rx_freq = d_hw_freq + d_lnb_lo + freq_hz;
     ui->freqCtrl->setFrequency(rx_freq);
+
+    if(sender() != uiDockRxOpt)
+        uiDockRxOpt->setFilterOffset(freq_hz);
 }
 
 /*! \brief Set a specific gain.
@@ -1063,7 +1072,7 @@ void MainWindow::iqFftTimeout()
     }
 
     ui->plotter->setNewFttData(d_iirFftData, d_realFftData, fftsize);
-
+    uiDockScanner->setNewFttData(d_iirFftData, fftsize); //FIXME
 }
 
 /*! \brief Audio FFT plot timeout. */
@@ -1290,6 +1299,7 @@ void MainWindow::setFftFill(bool enable)
     ui->plotter->setFftFill(enable);
     uiDockAudio->setFftFill(enable);
 }
+
 
 /*! \brief Force receiver reconfiguration.
  *

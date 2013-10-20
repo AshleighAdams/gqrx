@@ -38,6 +38,7 @@
 #include "qtgui/dockiqplayer.h"
 #include "qtgui/dockfft.h"
 #include "qtgui/afsk1200win.h"
+#include "qtgui/dockscanner.h"
 
 // see https://bugreports.qt-project.org/browse/QTBUG-22829
 #ifndef Q_MOC_RUN
@@ -94,6 +95,7 @@ private:
     DockInputCtl   *uiDockInputCtl;
     //DockIqPlayer   *uiDockIqPlay;
     DockFft        *uiDockFft;
+    DockScanner    *uiDockScanner;
 
     /* data decoders */
     Afsk1200Win    *dec_afsk1200;
