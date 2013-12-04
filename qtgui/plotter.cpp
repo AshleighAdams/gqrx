@@ -1086,9 +1086,10 @@ void CPlotter::drawOverlay()
     for (int i = 1; i < m_VerDivs; i++)
     {
         dB -= m_dBStepSize;  // move to end if want to include maxdb
+        int dB_fixed = (double)dB * (2.0/3.0);
         y = (int)((float)i*pixperdiv);
         rect.setRect(0, y-metrics.height()/2, m_YAxisWidth, metrics.height());
-        painter.drawText(rect, Qt::AlignRight|Qt::AlignVCenter, QString::number(dB));
+        painter.drawText(rect, Qt::AlignRight|Qt::AlignVCenter, QString::number(dB_fixed));
     }
 
     if (!m_Running)
