@@ -114,23 +114,14 @@ void CMeter::setLevel(float dbfs)
     if(dbfs > MAX_DB)
         dbfs = MAX_DB;
 
-    // decay delay
-    float level = (float)m_dBm;
-    if (dbfs < level) {
-        level = level*(1-d_alpha_decay) + dbfs*d_alpha_decay;
-    }
-    else {
-        level = level*(1-d_alpha_rise) + dbfs*d_alpha_rise;
-    }
-
-    m_dBm = (int)level;
+    m_dBm = dbfs;
 
     qreal w = (qreal)m_2DPixmap.width();
     w = w - 2.0*CTRL_MARGIN*w;	// width of meter scale in pixels
 
     // pixels / dB
     qreal pixperdb = w / fabs(MAX_DB - MIN_DB);
-    m_Slevel = (int)(-(MIN_DB-level)*pixperdb);
+    m_Slevel = (int)(-(MIN_DB-dbfs)*pixperdb);
 
     draw();
 }
@@ -146,6 +137,14 @@ double CMeter::getLevel()
 void CMeter::setSNRLevel(float db)
 {
     m_SNRdBm = (int)db;
+
+    qreal w = (qreal)m_2DPixmap.width();
+    w = w - 2.0*CTRL_MARGIN*w;	// width of meter scale in pixels
+
+    // pixels / dB
+    qreal pixperdb = w / fabs(MAX_DB - MIN_DB);
+    m_Nlevel = (int)(db*pixperdb);
+
     draw();
 }
 
@@ -184,7 +183,7 @@ void CMeter::draw()
     qreal hline = (qreal)h*CTRL_XAXIS_HEGHT;
     qreal marg = (qreal)w*CTRL_MARGIN;
     qreal ht = (qreal)h*CTRL_NEEDLE_TOP;
-    qreal x = marg + m_Slevel;
+    qreal x = marg + (m_Slevel - m_Nlevel);
     QPoint pts[3];
     pts[0].setX(x); pts[0].setY(ht+2);
     pts[1].setX(x-6); pts[1].setY(hline+8);
@@ -192,15 +191,29 @@ void CMeter::draw()
 
 
     //painter.setBrush(QBrush(Qt::green));
-    painter.setBrush(QBrush(QColor(0, 190, 0, 255)));
+    //painter.setBrush(QBrush(QColor(250, 170, 0, 255)));
     painter.setOpacity(1.0);
+    QPen pen(QColor(0, 0, 0, 0));
+    painter.setPen(pen);
+
+    painter.setBrush(QBrush(QColor(250, 170, 0, 255)));
+
 
 // Qt 4.8+ has a 1-pixel error (or they fixed line drawing)
 // see http://stackoverflow.com/questions/16990326
 #if QT_VERSION >= 0x040800
-    painter.drawRect(marg-1, ht+1, x-marg, 6);
+    painter.drawRect(marg + 1, ht+2, x-marg, 5);
 #else
-    painter.drawRect(marg, ht+2, x-marg, 6);
+    painter.drawRect(marg, ht+3, x-marg, 5);
+#endif
+
+    int from = marg + (x-marg);
+    painter.setBrush(QBrush(QColor(120, 250, 120, 255)));
+
+#if QT_VERSION >= 0x040800
+    painter.drawRect(from + 1, ht+2, m_Nlevel, 5);
+#else
+    painter.drawRect(from, ht+3, m_Nlevel, 5);
 #endif
 
     // create Font to use for scales

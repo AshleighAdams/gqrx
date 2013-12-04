@@ -74,6 +74,7 @@ private:
     QString m_dBStr;
     QString m_SNRdBStr;
     int m_Slevel;
+    int m_Nlevel;
     int m_dBm;
     int m_SNRdBm;
 
