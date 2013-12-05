@@ -58,7 +58,6 @@ signals:
 
 public slots:
     void setLevel(float dbfs);
-    double getLevel();
     void setSNRLevel(float db);
 
 protected:
