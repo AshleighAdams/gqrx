@@ -88,17 +88,17 @@ void Scanner::setScannerEnabled(bool enabled)
     m_Enabled=enabled;
 
     if(!m_Enabled)
-        m_CurrentBin=-1;
+        m_CurrentBin = -1;
 
     draw();
 }
 
 void Scanner::ignoreCurrent()
 {
-    if(m_CurrentBin!=-1)
+    if(m_CurrentBin != -1)
     {
-        m_BinTimes[m_CurrentBin]=-1;
-        m_CurrentBin=-1;
+        m_BinTimes[m_CurrentBin] = -1;
+        m_CurrentBin = -1;
         draw();
     }
 }
@@ -134,6 +134,15 @@ void Scanner::mousePressEvent(QMouseEvent * event)
     }
  }
 
+template<typename T>
+T map(T Value, T FromMin, T FromMax, T ToMax, T ToMin)
+{
+        T from_diff = FromMax - FromMin;
+        T to_diff = ToMax - ToMin;
+
+        T y = (Value - FromMin) / from_diff;
+        return ToMin + to_diff * y;
+}
 
 void Scanner::updateBinData()
 {
@@ -157,8 +166,69 @@ void Scanner::updateBinData()
         }
     }
 
+    // attempt to re-locate the center of the current bin:
+
+    if(m_CurrentBin != -1)
+    {
+        int center = m_CurrentBin;
+        int lower_bound = center;
+        int higher_bound = center;
+
+        for(int i = center - 1; i >= 0; i--)
+            if(m_BinTimes[i] >= MIN_ACTIVE_TIME) //(m_BinBestDB[i] >= m_Threshold)
+                lower_bound = i;
+            else
+                break;
+
+        for(int i = center + 1; i < m_NumBins; i++)
+            if(m_BinTimes[i] >= MIN_ACTIVE_TIME)//(m_BinBestDB[i] >= m_Threshold)
+                higher_bound = i;
+            else
+                break;
+
+        center = round(map(0.5, 0.0, 1.0, (double)lower_bound, (double)higher_bound));
+
+        if(center != m_CurrentBin)
+        {
+            if(m_BinTimes[center]==-1) //Bin disabled
+            {
+                m_CurrentBin = -1;
+            }
+            else
+            {
+                m_CurrentBin = center;
+                emit newDemodFreqDelta(m_BinBestOffset[center]);
+            }
+        }
+    }
+
     //Check if we need to switch bin
     int best=-1;
+
+    /*
+    for(int i=0; i<m_NumBins; i++)
+    {
+        if(m_BinTimes[i]==-1) //Bin disabled
+            continue;
+
+        if(m_BinBestDB[i]>=m_Threshold)
+        {
+            int peak = 0;
+            int start = i;
+            int end;
+
+            for(i++;i<m_NumBins;i++)
+                if(m_BinBestDB[i] < m_Threshold)
+                    break;
+                else
+                    peak = m_BinBestDB[i] > peak ? m_BinBestDB[i] : peak;
+            end = i - 1;
+
+            best = start + round(((double)start - (double)end) / 2.0);
+        }
+    }
+    */
+
     for(int i=0; i<m_NumBins; i++)
     {
         if(m_BinTimes[i]==-1) //Bin disabled

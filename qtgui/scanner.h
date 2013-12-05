@@ -5,8 +5,8 @@
 #include <QtGui>
 #include <QImage>
 
-#define MIN_ACTIVE_TIME 500 //.5 secs
-#define MIN_STAY_TIME 2000 //2 secs
+#define MIN_ACTIVE_TIME 10 //0.01 secs
+#define MIN_STAY_TIME 100 //0.1 secs
 
 class Scanner : public QFrame
 {
