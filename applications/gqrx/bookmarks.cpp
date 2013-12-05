@@ -19,6 +19,9 @@ void Bookmarks::remove(int index)
 
 bool Bookmarks::load(QString filename)
 {
+    if(filename.endsWith("/"))
+        filename += "Default.csv";
+
     QFile file(filename);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -55,6 +58,9 @@ bool Bookmarks::load(QString filename)
 //FIXME: Commas in names
 bool Bookmarks::save(QString filename)
 {
+    if(filename.endsWith("/"))
+        filename += "Default.csv";
+
     QFile file(filename);
     if(file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text))
     {
