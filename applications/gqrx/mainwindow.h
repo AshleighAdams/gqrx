@@ -37,6 +37,7 @@
 #include "qtgui/dockinputctl.h"
 #include "qtgui/dockiqplayer.h"
 #include "qtgui/dockfft.h"
+#include "qtgui/dockfreqtable.h"
 #include "qtgui/afsk1200win.h"
 #include "qtgui/dockscanner.h"
 
@@ -99,6 +100,7 @@ private:
     //DockIqPlayer   *uiDockIqPlay;
     DockFft        *uiDockFft;
     DockScanner    *uiDockScanner;
+    DockFreqTable  *uiDockFreqTable;
 
     /* data decoders */
     Afsk1200Win    *dec_afsk1200;

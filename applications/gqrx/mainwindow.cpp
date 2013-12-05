@@ -105,6 +105,12 @@ MainWindow::MainWindow(const QString cfgfile, bool edit_conf, QWidget *parent) :
     //uiDockIqPlay = new DockIqPlayer();
     uiDockFft = new DockFft();
     uiDockScanner = new DockScanner();
+    uiDockFreqTable = new DockFreqTable(m_cfg_dir, this);
+
+    setCorner( Qt::TopLeftCorner, Qt::LeftDockWidgetArea );
+    setCorner( Qt::TopRightCorner, Qt::RightDockWidgetArea );
+    setCorner( Qt::BottomLeftCorner, Qt::LeftDockWidgetArea );
+    setCorner( Qt::BottomRightCorner, Qt::RightDockWidgetArea );
 
     /* Add dock widgets to main window. This should be done even for
        dock widgets that are going to be hidden, otherwise they will
@@ -120,6 +126,8 @@ MainWindow::MainWindow(const QString cfgfile, bool edit_conf, QWidget *parent) :
     addDockWidget(Qt::RightDockWidgetArea, uiDockAudio);
     addDockWidget(Qt::RightDockWidgetArea, uiDockFft);
     tabifyDockWidget(uiDockFft, uiDockAudio);
+
+    addDockWidget(Qt::LeftDockWidgetArea, uiDockFreqTable);
 
     //addDockWidget(Qt::BottomDockWidgetArea, uiDockIqPlay);
 
@@ -192,6 +200,7 @@ MainWindow::MainWindow(const QString cfgfile, bool edit_conf, QWidget *parent) :
     connect(uiDockFft, SIGNAL(fftFillToggled(bool)), this, SLOT(setFftFill(bool)));
     connect(uiDockFft, SIGNAL(fftPeakHoldToggled(bool)), this, SLOT(setFftPeakHold(bool)));
     connect(uiDockFft, SIGNAL(peakDetectionToggled(bool)), this, SLOT(setPeakDetection(bool)));
+    connect(uiDockFreqTable, SIGNAL(newFrequency(qint64)), this, SLOT(setNewFrequency(qint64)));
 
     connect(remote, SIGNAL(newFilterOffset(qint64)), this, SLOT(setFilterOffset(qint64)));
     connect(remote, SIGNAL(newFilterOffset(qint64)), uiDockRxOpt, SLOT(setFilterOffset(qint64)));
@@ -567,6 +576,8 @@ void MainWindow::setNewFrequency(qint64 rx_freq)
     // update widgets
     ui->plotter->setCenterFreq(center_freq);
     uiDockRxOpt->setHwFreq(d_hw_freq);
+    ui->freqCtrl->setFrequency(rx_freq);
+    uiDockFreqTable->setNewFrequency(rx_freq);
 }
 
 /*! \brief Set new LNB LO frequency.
