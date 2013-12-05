@@ -173,25 +173,36 @@ void Scanner::updateBinData()
         int center = m_CurrentBin;
         int lower_bound = center;
         int higher_bound = center;
+        bool isbad = false;
 
         for(int i = center - 1; i >= 0; i--)
+        {
+            if(m_BinTimes[i] == -1)
+                isbad = true;
             if(m_BinTimes[i] >= MIN_ACTIVE_TIME) //(m_BinBestDB[i] >= m_Threshold)
                 lower_bound = i;
             else
                 break;
+        }
 
         for(int i = center + 1; i < m_NumBins; i++)
+        {
+            if(m_BinTimes[i] == -1)
+                isbad = true;
             if(m_BinTimes[i] >= MIN_ACTIVE_TIME)//(m_BinBestDB[i] >= m_Threshold)
                 higher_bound = i;
             else
                 break;
-
+        }
         center = round(map(0.5, 0.0, 1.0, (double)lower_bound, (double)higher_bound));
 
-        if(center != m_CurrentBin)
+        if(center != m_CurrentBin || isbad)
         {
-            if(m_BinTimes[center]==-1) //Bin disabled
+            if(isbad) //Bin disabled
             {
+                for(int i = lower_bound; i <= higher_bound; i++)
+                    m_BinTimes[i] = -1; // disable the one it came from too (so it spreads like cancer)
+
                 m_CurrentBin = -1;
             }
             else
