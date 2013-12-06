@@ -148,6 +148,7 @@ MainWindow::MainWindow(const QString cfgfile, bool edit_conf, QWidget *parent) :
     ui->menu_View->addAction(uiDockAudio->toggleViewAction());
     ui->menu_View->addAction(uiDockFft->toggleViewAction());
     ui->menu_View->addAction(uiDockScanner->toggleViewAction());
+    ui->menu_View->addAction(uiDockFreqTable->toggleViewAction());
     //ui->menu_View->addAction(uiDockIqPlay->toggleViewAction());
     ui->menu_View->addSeparator();
     ui->menu_View->addAction(ui->mainToolBar->toggleViewAction());

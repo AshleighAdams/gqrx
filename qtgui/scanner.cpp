@@ -21,7 +21,7 @@ Scanner::Scanner(QWidget *parent) : QFrame(parent)
     m_MindB = -80;
     m_MaxdB = 0;
 
-    m_NumBins=100;
+    m_NumBins = 200;
     m_BinTimes = new int[m_NumBins](); //Default initializer
     m_BinBestDB = new double[m_NumBins];
     m_BinBestOffset = new qint64[m_NumBins];
@@ -29,7 +29,7 @@ Scanner::Scanner(QWidget *parent) : QFrame(parent)
     m_LastUpdate=QTime();
     m_LastTune=QTime();
 
-    m_PenColor = Qt::yellow;
+    m_PenColor = Qt::white;
 }
 
 Scanner::~Scanner()

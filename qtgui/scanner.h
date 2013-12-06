@@ -6,7 +6,7 @@
 #include <QImage>
 
 #define MIN_ACTIVE_TIME 10 //0.01 secs
-#define MIN_STAY_TIME 100 //0.1 secs
+#define MIN_STAY_TIME 250 //0.25 secs
 
 class Scanner : public QFrame
 {
